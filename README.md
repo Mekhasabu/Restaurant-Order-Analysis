@@ -31,6 +31,6 @@ select * from menu_items;
 select count(*) from menu_items;
 
 ```
-|Solution|
----------
-|32      |
+| Solution |
+| -------- |
+|  32      |
