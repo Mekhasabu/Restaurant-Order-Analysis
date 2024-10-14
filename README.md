@@ -23,8 +23,14 @@ A quarter's worth of orders from a fictitious restaurant serving international c
 3. What were the top 5 orders that spent the most money in?
 4. View the details of the highest spend orders. What insights can you gather from the results?
 5. View the details of the top 5 highest spend orders. What insights can you gather from the results?   
-   
+### Objective 1. Explore the items table   
 ```sql
 -- View the menu items table
 select * from menu_items;
+-- Find the number of items on the table
+select count(*) from menu_items;
+
 ```
+|Solution|
+---------
+|32      |
