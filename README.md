@@ -39,41 +39,213 @@ select count(*) from menu_items;
 select * from menu_items
 order by price;
 ```
-|Solution|
-| menu_item_id| item_name                | category   | price |
+#### solution
+| menu_item_id| item_name    | category   | price |
 | --- | -------------------- | --------- | ----- |
 | 113 | Edamame              | Asian     |  5.00 |
-| 105 | Mac & Cheese         | American  |  7.00 |
-| 106 | French Fries         | American  |  7.00 |
-| 122 | Chips & Salsa        | Mexican   |  7.00 |
-| 103 | Hot Dog              | American  |  9.00 |
-| 114 | Potstickers          | Asian     |  9.00 |
-| 123 | Chips & Guacamole    | Mexican   |  9.00 |
-| 104 | Veggie Burger        | American  | 10.50 |
-| 121 | Cheese Quesadillas   | Mexican   | 10.50 |
-| 111 | California Roll      | Asian     | 11.95 |
-| 115 | Chicken Tacos        | Mexican   | 11.95 |
-| 119 | Chicken Torta        | Mexican   | 11.95 |
-| 101 | Hamburger            | American  | 12.95 |
-| 117 | Chicken Burrito      | Mexican   | 12.95 |
-| 102 | Cheeseburger         | American  | 13.95 |
-| 116 | Steak Tacos          | Mexican   | 13.95 |
-| 120 | Steak Torta          | Mexican   | 13.95 |
-| 108 | Tofu Pad Thai        | Asian     | 14.50 |
-| 124 | Spaghetti            | Italian   | 14.50 |
-| 126 | Fettuccine Alfredo   | Italian   | 14.50 |
-| 112 | Salmon Roll          | Asian     | 14.95 |
-| 118 | Steak Burrito        | Mexican   | 14.95 |
-| 128 | Cheese Lasagna       | Italian   | 15.50 |
-| 129 | Mushroom Ravioli     | Italian   | 15.50 |
-| 107 | Orange Chicken       | Asian     | 16.50 |
-| 132 | Eggplant Parmesan    | Italian   | 16.95 |
-| 109 | Korean Beef Bowl     | Asian     | 17.95 |
-| 110 | Pork Ramen           | Asian     | 17.95 |
-| 125 | Spaghetti & Meatballs| Italian   | 17.95 |
-| 127 | Meat Lasagna         | Italian   | 17.95 |
-| 131 | Chicken Parmesan     | Italian   | 17.95 |
 | 130 | Shrimp Scampi        | Italian   | 19.95 |
 
+```sql
 
+-- How many italian dishes are on the menu?
+select count(category) from menu_items
+where category='Italian';
+```
+| Solution |
+| -------- |
+|  9    |
+
+```sql
+-- How many dishes are in each category?
+select category, count(menu_item_id) as num_dishes
+from menu_items
+group by category;
+
+```
+#### Solution
+| Category  | num_dishes |
+| -------- | ---------------- |
+| American | 6                |
+| Asian    | 8                |
+| Mexican  | 9                |
+| Italian  | 9                |
+
+```sql
+-- What is the average dish price within each category?
+select category, avg(price) as avg_price_dishes
+from menu_items
+group by category;
+```
+#### Solution
+| Category  | avg_price_dishes |
+| -------- | -------------- |
+| American | 10.07          |
+| Asian    | 13.48          |
+| Mexican  | 11.80          |
+| Italian  | 16.75          |
+
+### Objective 2:Explore the orders table
+```sql
+-- View the order details table
+select * from order_details;
+
+-- What is the date range of the table
+select * from order_details
+order by order_date;
+
+select min(order_date), max(order_date) from order_details;
+```
+#### Solution
+|min(order_date)|max(order_date)|
+|-------------|------------|
+|2023-01-01|	2023-03-31|
+
+```sql
+-- How many orders were made within this date range 
+select count(distinct order_id) as item_ordered from order_details
+order by order_date;
+```
+
+| Solution |
+| -------- |
+|  5370     |
 			
+```sql
+-- How many items were ordered within this date range
+select count(order_id)from order_details
+order by order_date;
+
+```
+
+| Solution |
+| -------- |
+|  12234  |
+
+```sql
+-- Which orders had the most number of the items
+select order_id, count(item_id) as num_dishes from order_details
+group by order_id
+order by num_dishes desc;
+```
+#### Solution
+| order_id  | num_dishes |
+| ---- | ----- |
+| 4305 | 14    |
+| 3473 | 14    |
+| 1957 | 14    |
+| 330  | 14    |
+| 440  | 14    |
+| 443  | 14    |
+| 2675 | 14    |
+```sql
+-- How many orders have more than 12 items
+select count(*) from
+(select order_id, count(item_id) as num_dishes from order_details
+group by order_id
+having num_dishes>12) as num_orders;
+```
+| Solution |
+| -------- |
+|  20  |
+
+#### Objective 4 : Customer Behaviour
+```sql
+-- Combine the menu_items and order_details tables into single table
+
+select *
+from order_details od left join menu_items mi 
+on od.item_id = mi.menu_item_id;
+```
+```sql
+-- What were the least and most ordered items? What categories were they in?
+select item_name, count(order_details_id) as num_purchases
+from order_details od left join menu_items mi 
+    on od.item_id = mi.menu_item_id
+group by item_name
+order by num_purchases desc;
+
+select item_name,category,count(order_details_id) as num_purchases
+from order_details od left join menu_items mi 
+    on od.item_id = mi.menu_item_id
+group by item_name, category
+order by num_purchases desc;
+```
+
+#### Solution
+| item_name                  | Category   | num_purchases |
+| ---------------------- | --------- | -------- |
+| Hamburger              | American  | 622      |
+| Chicken Tacos          | Mexican   | 123      |
+
+```sql
+-- What were the top 5 orders that spent the most money?
+select order_id, sum(price) as total_spend
+from order_details od left join menu_items mi 
+    on od.item_id = mi.menu_item_id
+group by order_id
+order by total_spend desc
+limit 5;
+```
+#### Solution
+| order_id   | total_spend  |
+| ---- | ------- |
+| 440  | 192.15  |
+| 2075 | 191.05  |
+| 1957 | 190.10  |
+| 330  | 189.70  |
+| 2675 | 185.10  |
+
+```sql
+-- View the details of the top 5 orders. What insights can you gather from the results?
+select category ,count(item_id) as num_id
+from order_details od left join menu_items mi 
+    on od.item_id = mi.menu_item_id
+where order_id=440
+group by category;
+```
+#### Solution
+| Category  | num_id |
+| -------- | ----- |
+| Mexican  | 2     |
+| American | 2     |
+| Italian  | 8     |
+| Asian    | 2     |
+
+```sql
+-- View the details of the top 5 highest spend order. What insights can you gather from the results?
+select order_id,category ,count(item_id) as num_id
+from order_details od left join menu_items mi 
+    on od.item_id = mi.menu_item_id
+where order_id in (440,2075,1957,330,2675)
+group by order_id, category;
+```
+#### Solution
+| order_id  | Category  | num_id |
+| ---- | -------- | ----- |
+| 330  | Asian    | 6     |
+| 330  | American | 1     |
+| 330  | Italian  | 3     |
+| 330  | Mexican  | 4     |
+| 440  | Mexican  | 2     |
+| 440  | American | 2     |
+| 440  | Italian  | 8     |
+| 440  | Asian    | 2     |
+| 1957 | Asian    | 3     |
+| 1957 | American | 3     |
+| 1957 | Italian  | 5     |
+| 1957 | Mexican  | 3     |
+| 2075 | Asian    | 3     |
+| 2075 | Mexican  | 3     |
+| 2075 | American | 1     |
+| 2075 | Italian  | 6     |
+| 2675 | American | 3     |
+| 2675 | Asian    | 3     |
+| 2675 | Italian  | 4     |
+| 2675 | Mexican  | 4     |
+
+
+
+
+
+
+
