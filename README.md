@@ -243,7 +243,12 @@ group by order_id, category;
 | 2675 | Italian  | 4     |
 | 2675 | Mexican  | 4     |
 
-
+### Insights
+1. There are 32 items in total in the menu which belongs to different categories like asian, american , italian and mexican
+2. The most expensive item in the menu is Shrimp Scampi which is an Italian Cuisines and least expensive is edamame which is an asian dish.
+3. 5370 orders were made within three months time period
+4. Hamburger which belongs to Amercan cuisine is the most popular and chicken tacos is less popular
+5. Italian cuisines are most ordered cuisine among the customers
 
 
 
